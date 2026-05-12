@@ -183,7 +183,7 @@ psutil
 
 If you use this framework, please cite:
 
-> [Author et al.] (under review). A Multi-Source Data Integration Framework for Stormwater Infrastructure Analytics.
+> [Alfa et al.] (under review). A Multi-Source Data Integration Framework for Stormwater Infrastructure Analytics.
 
 ---
 
