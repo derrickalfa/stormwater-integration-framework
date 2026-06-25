@@ -13,8 +13,8 @@ from pathlib import Path
 # =============================================================================
 # ROOT DIRECTORIES — update these two lines for your machine
 # =============================================================================
-INPUT_ROOT  = Path(r"C:\Users\Acer\Desktop\PolyU\Research\Data")
-OUTPUT_ROOT = Path(r"C:\Users\Acer\Desktop\PolyU\Research\Data\ML_Aggregated_Analysis")
+INPUT_ROOT  = Path(r"path/to/your/raw/data")
+OUTPUT_ROOT = Path(r"path/to/your/output/folder")
 
 
 class Paths:
@@ -93,10 +93,20 @@ class Paths:
     MAINTENANCE_FIXED      = OUTPUT_ROOT / "manhole_data_with_maintenance.csv"
 
     # ── Final outputs ──────────────────────────────────────────────────────────
+    # Classification dataset: all 291,116 inspection records with binary surcharge label
     FINAL_CLASSIFICATION   = OUTPUT_ROOT / "final_dataset_classification.csv"
+    # Regression dataset (V3): records with Water_Depth > 0 and valid Surcharge_Ratio
+    # (152,949 records from 58,477 manholes — see Section 4.8 of the paper)
     FINAL_REGRESSION       = OUTPUT_ROOT / "final_dataset_regression.csv"
     CORRELATION_MATRIX     = OUTPUT_ROOT / "correlation_matrix.csv"
     QUALITY_REPORT         = OUTPUT_ROOT / "data_quality_report.xlsx"
+
+    # ── NLP evaluation outputs (handlabel pipeline) ───────────────────────────
+    # Produced by handlabel_sampler.py and consumed by handlabel_scorer.py.
+    # Written to OUTPUT_ROOT — never commit these to git (add to .gitignore).
+    HANDLABEL_TASK         = OUTPUT_ROOT / "handlabel_TASK.csv"    # labeller fills this in
+    HANDLABEL_KEY          = OUTPUT_ROOT / "handlabel_KEY.csv"     # model predictions (hidden key)
+    HANDLABEL_RESULT       = OUTPUT_ROOT / "handlabel_RESULT.csv"  # scorer summary output
 
     @classmethod
     def ensure_output_dirs(cls):
@@ -141,12 +151,18 @@ class Params:
     MISSING_COL_THRESHOLD  = 0.5           # drop columns with > 50% missing
     SAMPLE_SIZE_CORR       = 50_000
 
+    # NLP evaluation (handlabel pipeline)
+    HANDLABEL_SAMPLE_SIZE     = 300         # total activity strings to label
+    HANDLABEL_MIN_PER_CAT     = 10          # floor per category for stratified sampling
+    HANDLABEL_RANDOM_STATE    = 42          # reproducibility seed
+    HANDLABEL_STORMWATER_ONLY = True        # restrict to S-prefix features (paper scope)
+
     # Response time categories (days)
     RESPONSE_TIME_CATEGORIES = {
-        "Emergency - Same Day": 0,
-        "Urgent - 1 Day":       1,
-        "High - 3 Days":        3,
-        "Medium - 1 Week":      7,
-        "Low - 1 Month":        30,
+        "Emergency - Same Day":   0,
+        "Urgent - 1 Day":         1,
+        "High - 3 Days":          3,
+        "Medium - 1 Week":        7,
+        "Low - 1 Month":          30,
         "Backlog - Over 1 Month": float("inf"),
     }
