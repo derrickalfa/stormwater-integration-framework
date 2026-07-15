@@ -247,6 +247,99 @@ If you use this framework, please cite:
 
 ---
 
+---
+
+## Paper B — Surcharge Risk Assessment and Asset Prioritisation (ML Scripts)
+
+The scripts in `ml/` implement the two-tier explainable machine-learning framework
+reported in:
+
+> **Maintenance-Informed Explainable Machine Learning for Surcharge Risk Assessment
+> and Prioritisation of Assets in Underground Stormwater Drainage Networks**
+> Alfa, D., Ali, E., & Zayed, T. (under review), *Automation in Construction*
+
+These scripts consume the datasets produced by the integration pipeline above
+(`Paths.FINAL_CLASSIFICATION` and `Paths.FINAL_REGRESSION`).
+
+### ML Pipeline
+
+```
+Stage 11  ml/11_classification_primary.py
+          Manhole-grouped 8-model classification benchmark
+          Target: Is_Surcharged (binary)
+          Key result: XGBoost F1=0.702, LightGBM F1=0.701 (ROC-AUC 0.969/0.968)
+
+Stage 12  ml/12_severity_primary.py
+          Manhole-grouped 8-model regression benchmark
+          Target: Surcharge_Ratio (continuous)
+          Key result: LightGBM R2=0.715, MAE=0.065
+
+Holdout R2-13a  ml/holdout_spatial_classification.py
+          Spatial hold-out: train 80% of districts, test 20% (5 seeds)
+          Key result: LightGBM F1=0.574 +/- 0.145; Random Forest best at 0.579
+
+Holdout R2-13b  ml/holdout_spatial_regression.py
+          Spatial hold-out: regression tier, same 80/20 district split (5 seeds)
+          Key result: LightGBM R2=0.502 +/- 0.137; Gradient Boosting best at 0.543
+
+Holdout R2-13c  ml/holdout_spatial_regression_B.py
+          Spatial hold-out Design B: re-tuned 3-way 60/20/20 split, top-2 only
+          Supplementary robustness check — not reported in primary Table 8
+
+Holdout R2-04a  ml/holdout_temporal_classification.py
+          Temporal hold-out: train <=2018, test 2019-2021
+          Key result: Random Forest F1=0.725 (best); LightGBM drops to 0.525
+
+Holdout R2-04b  ml/holdout_temporal_regression.py
+          Temporal hold-out: regression tier, same <=2018 / 2019-2021 split
+          Key result: XGBoost R2=0.573 (best); no ranking reversal in severity tier
+```
+
+### Running the ML scripts
+
+```bash
+# Primary benchmarks (run first)
+python ml/11_classification_primary.py
+python ml/12_severity_primary.py
+
+# Holdout robustness (requires primary benchmark _params.json outputs)
+python ml/holdout_spatial_classification.py
+python ml/holdout_spatial_regression.py
+python ml/holdout_temporal_classification.py
+python ml/holdout_temporal_regression.py
+
+# Optional supplementary
+python ml/holdout_spatial_regression_B.py
+```
+
+Runtime: approximately 1-2 hours per script on a mid-range GPU workstation.
+Holdout scripts load hyperparameters from primary benchmark `{Model}_params.json`
+files without re-tuning (param-reuse mode).
+
+### Updated repository structure
+
+```
+stormwater-framework/
+├── config.py
+├── requirements.txt
+├── README.md
+├── src/                                  <- Integration pipeline (Stages 00-10)
+│   ├── 00_raw_maintenance_preprocessing.py
+│   ├── ...
+│   └── 10_framework_validation.py
+├── ml/                                   <- Paper B ML scripts
+│   ├── 11_classification_primary.py
+│   ├── 12_severity_primary.py
+│   ├── holdout_spatial_classification.py
+│   ├── holdout_spatial_regression.py
+│   ├── holdout_spatial_regression_B.py   <- supplementary only
+│   ├── holdout_temporal_classification.py
+│   └── holdout_temporal_regression.py
+├── data/sample/
+├── docs/
+└── tests/
+```
+
 ## License
 
 MIT License — code is freely reusable. Data files are not included and remain

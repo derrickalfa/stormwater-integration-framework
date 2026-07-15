@@ -108,6 +108,18 @@ class Paths:
     HANDLABEL_KEY          = OUTPUT_ROOT / "handlabel_KEY.csv"     # model predictions (hidden key)
     HANDLABEL_RESULT       = OUTPUT_ROOT / "handlabel_RESULT.csv"  # scorer summary output
 
+    # ── ML model outputs — Paper B (Surcharge Risk Assessment) ───────────────
+    ML_CLASSIFICATION_DIR      = OUTPUT_ROOT / "ml" / "classification_primary"
+    ML_SEVERITY_DIR            = OUTPUT_ROOT / "ml" / "severity_primary"
+
+    # ── Holdout robustness outputs ────────────────────────────────────────────
+    ML_CLASSIFICATION_SPATIAL  = OUTPUT_ROOT / "ml" / "holdouts" / "spatial_classification"
+    ML_SEVERITY_SPATIAL        = OUTPUT_ROOT / "ml" / "holdouts" / "spatial_regression"
+    ML_SEVERITY_SPATIAL_B      = OUTPUT_ROOT / "ml" / "holdouts" / "spatial_regression_B"
+    ML_CLASSIFICATION_TEMPORAL = OUTPUT_ROOT / "ml" / "holdouts" / "temporal_classification"
+    ML_SEVERITY_TEMPORAL       = OUTPUT_ROOT / "ml" / "holdouts" / "temporal_regression"
+
+
     @classmethod
     def ensure_output_dirs(cls):
         OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
