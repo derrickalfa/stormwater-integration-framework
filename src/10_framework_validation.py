@@ -173,27 +173,44 @@ def validate_internal_consistency(df, val_dir):
     # ── 6.1.2  Maintenance aggregation completeness ──────────────────────────
     _print("  6.1.2  Maintenance aggregation completeness")
 
-    act_cols = [c for c in df.columns
-                if c.endswith(("_count", "Blockages", "General_Cleaning",
-                               "Infiltration_and_inflow", "Cracks_and_fractures",
-                               "Defective_lining", "Deformation",
-                               "General_Maintenance", "Inspection",
-                               "Environmental"))
-                and c != "Total_Maintenance_Events"
-                and pd.api.types.is_numeric_dtype(df[c])]
+    maint_cats = [c for c in [
+        "Blockages_SinceLastInsp",
+        "Blockage_and_Inspection",
+        "General_Cleaning_SinceLastInsp",
+        "Infiltration_and_inflow",
+        "Flow_velocity__hydraulic_conditions",
+        "Cracks_and_fractures",
+        "Defective_lining",
+        "Deformation",
+        "Corrosion_and_abrasion_of_pipes",
+        "Defective_connection",
+        "Broken_manhole_covers__damaged_manhole_walls",
+        "Environmental",
+        "Inspection",
+        "General_Maintenance",
+    ] if c in df.columns]
 
     # Use maintenance category columns that exist
     maint_cats = [c for c in [
-        "Blockages", "General_Cleaning", "Infiltration_and_inflow",
-        "Flow_velocity__hydraulic_conditions", "Cracks_and_fractures",
-        "Defective_lining", "Deformation", "Corrosion_and_abrasion_of_pipes",
-        "Defective_connection", "Broken_manhole_covers__damaged_manhole_walls",
-        "Environmental", "Inspection", "General_Maintenance",
+        "Blockages_SinceLastInsp",
+        "Blockage_and_Inspection",
+        "General_Cleaning_SinceLastInsp",
+        "Infiltration_and_inflow",
+        "Flow_velocity__hydraulic_conditions",
+        "Cracks_and_fractures",
+        "Defective_lining",
+        "Deformation",
+        "Corrosion_and_abrasion_of_pipes",
+        "Defective_connection",
+        "Broken_manhole_covers__damaged_manhole_walls",
+        "Environmental",
+        "Inspection",
+        "General_Maintenance",
     ] if c in df.columns]
 
-    if "Total_Maintenance_Events" in df.columns and maint_cats:
+    if "Total_Maintenance_Events_SinceLastInsp" in df.columns and maint_cats:
         cat_sum  = df[maint_cats].sum(axis=1)
-        total    = df["Total_Maintenance_Events"]
+        total    = df["Total_Maintenance_Events_SinceLastInsp"]
         exact    = (abs(cat_sum - total) < 0.01).sum()
         near     = (abs(cat_sum - total) < 1.0).sum()
 
@@ -719,7 +736,7 @@ def build_summary_table(df):
 def main():
     Paths.ensure_output_dirs()
 
-    val_dir = Paths.OUTPUT_ROOT / "validation"
+    val_dir = Paths.FINAL_CLASSIFICATION.parent / "validation"
     val_dir.mkdir(parents=True, exist_ok=True)
     _print(f"Output directory: {val_dir}")
 
